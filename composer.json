@@ -1,0 +1,10 @@
+{
+    "name": "radagea/majframe",
+    "autoload": {
+        "psr-4": {
+            "Majframe\\": "framework/",
+            "CigiApp\\": "src/"
+        }
+    },
+    "require": {}
+}

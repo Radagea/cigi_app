@@ -1,0 +1,188 @@
+openapi: '3.0.2'
+info:
+  title: CigiApp - API V0.1
+  version: '0.1.1'
+servers:
+  - url: https://idonnow.hu/
+tags:
+  - name: Authentication
+  - name: Users
+paths:
+  /auht/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register an account
+      requestBody:
+        description: Register an account, After successful registration, it return with the authentication token.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: 
+                  type: string
+                password:
+                  type: string
+                full_name:
+                  type: string
+              required:
+                - email
+                - password
+                - full_name
+
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                  properties:
+                    message:
+                      type: string
+                    auth_token:
+                      type: string
+                    exp_date:
+                      type: string
+                  example:
+                    message: Success,
+                    auth_token: Q2lnaUFwcC0xNjk2NzgyMzE5LTY1MjJkN2VmZTg0NjY=
+                    exp_date: 2023-10-08 20:25:19
+        '406':
+          description: 'Something went wrong - Check the response for more information'
+          content:
+            application/json:
+              schema:
+                  properties:
+                    message:
+                      type: string
+                    error:
+                      type: integer
+                  example:
+                    message: 'A user is already exists with this email'
+                    error: 200
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login with email and password
+      requestBody:
+        description: Send the email and password in plain text
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+                  auth_token:
+                    type: string
+                  exp_date:
+                    type: string
+                example:
+                  message: Success
+                  auth_token: Q2lnaUFwcC0xNjk2NzgyMzE5LTY1MjJkN2VmZTg0NjY=
+                  exp_date: 2023-10-08 20:25:19
+  /user:
+    get:
+      tags:
+        - Users
+      summary: Return the user who owns this Bearer Token
+      description: This endpoint requires Bearer Token Authentication
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                properties:
+                  auth:
+                    type: object
+                    $ref: "#/components/schemas/returnAuthProp"
+                  message:
+                    type: string
+                    example: Success
+                  user:
+                    type: object
+                    $ref: "#/components/schemas/userContentProp"
+                    example:
+                      id: 8
+                      full_name: Vicc Elek(Haha)
+                      email: viccelek@gmail.com
+  /user/{id_user}:
+    get:
+      tags:
+        - Users
+      summary: Get user data by ID
+      description: This endpoint requires Bearer Token Authentication
+      parameters:
+        - name: id_user
+          in: path
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                properties:
+                  auth:
+                    type: object
+                    $ref: "#/components/schemas/returnAuthProp"
+                    example:
+                      auth_token: Q2lnaUFwcC0xNjk2ODg0OTAzLTY1MjQ2OGE3MDAyYzI
+                      exp_date: 2023-10-10 00:55:03
+                  message:
+                    type: string
+                    example: Success
+                  user:
+                    type: object
+                    $ref: "#/components/schemas/userContentProp"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    returnAuthProp:
+      properties:
+        auth_token:
+          type: string
+        exp_date:
+          type: string
+      example:
+        auth_token: Q2lnaUFwcC0xNjk2ODg0OTAzLTY1MjQ2OGE3MDAyYzI
+        exp_date: 2023-10-10 00:55:03
+    userContentProp:
+      properties:
+        id:
+          type: integer
+        full_name:
+          type: string
+        email:
+          type: string
+      example:
+        id: 8
+        full_name: Vicc Elek(Haha)
+        email: viccelek@gmail.com
